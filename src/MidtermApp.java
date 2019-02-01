@@ -5,6 +5,7 @@ public class MidtermApp {
 
 
     	System.out.println("George is here!");
+    	System.out.println("Jason is also here!");
     }
 
 }
