@@ -1,0 +1,51 @@
+(See http://minesweeperonline.com/if you aren’t familiar with this game.)
+Write a console Minefield application.  At a minimum, this game should include:
+
+•A class to hold the minefield in a 2D array, with methods to generate the minefield and to check a specific cell.
+You are responsible for generating not just the mines but all the numbers in cells with adjacent mines!!
+
+•A way of displaying the current state of the minefield (with symbols for unknown, empty, and flagged mines).  There are several ways to do this either in the main app or in the minefield; some are better than others.
+
+•A main class which takes input from the user:
+Ask for the size of the minefield (either provide a menu of at least 3 sizes you’ve specified or allow any custom size up to a maximum number of rows/columns): Custom
+
+
+The number of mines could either be set by the size or entered by the user: Set by User
+
+
+Ask what they want to do next, flag a mine or uncover a cell.  
+
+If they uncover a mine, display a game over screen with the full solution of the minefield.  
+
+If they uncover an empty cell, uncover all the empty cells and numbers adjacent (like the sample online minesweeper) and re-display the board.
+
+
+
+
+     B4  B5  B6
+     c4 C5  c6 
+     D4 D5  D6
+
+user picks C5
+
+if (C5 == Mine) then Game Over
+
+else if (C5 == Empty Cell) then: 
+Reveal the space as Empty
+Check adjacent cells for Empty and Reveal
+
+
+
+
+Empty Check:
+First, check which cells are adjacent
+
+[ ][ ][ ][ ][ ][ ]
+[0][0][0][0][1][1]
+[ ][ ][ ][F]
+
+
+
+
+
+
