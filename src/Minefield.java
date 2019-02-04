@@ -13,37 +13,55 @@
 public class Minefield {
     private boolean revealed;
     private boolean mine;
+    private int adjacency = 0;
     
+    
+
     public Minefield() {        //set defaults to hide the tile and to not have a mine
         this.revealed = false;
         this.mine = false;
     }
     
-    public Minefield(boolean revealed, boolean mine) {
+    public Minefield(boolean revealed, boolean mine) 
+    {
         this.revealed = revealed;
         this.mine = mine;
     }
     
-    public void setRevealed(boolean reveal) {
+    public void setRevealed(boolean reveal) 
+    {
         this.revealed =  reveal; //sets whether tile is revealed or not      
     } //end setRevealed
     
-    public  boolean getRevealed() {
+    public  boolean getRevealed() 
+    {
         return this.revealed; //returns the state of revealed
     } //end getRevealed
 
-    public void setMine(boolean mine) {
+    public void setMine(boolean mine) 
+    {
         this.mine = mine;
     } //end setMine
     
-    public boolean getMine() {
+    public boolean getMine() 
+    {
         return this.mine; //returns the state of whether this object has a mine
     } //end getMine
 
+    public int getAdjacency() 
+    {
+        return adjacency;
+    }
+
+    public void setAdjacency(int adjacency) 
+    {
+        this.adjacency = adjacency;
+    }
   
     
     @Override
-    public String toString() {
+    public String toString() 
+    {
         return "Revealed: " + revealed + ", Is there a mine: " + mine + "]";
     } //end toString Override
 
