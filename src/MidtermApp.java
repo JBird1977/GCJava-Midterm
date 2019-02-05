@@ -18,10 +18,8 @@ public class MidtermApp {
         ArrayList<ArrayList<Minefield>> gameBoard = new ArrayList<ArrayList<Minefield>>();
         int boardColumns = 0; // columns
         int boardRows = 0; // rows
-    //    int userX = 0; // user input for boardColumns coordinate while playing game
-     //   int userY = 0; // user input for boardRows coordinate while playing game
-      //  int row = 0;
-      //  int column = 0;
+        int userRow = 0;
+        int userColumn = 0;
 
         // creates the board
         printTitle(); // prints title
@@ -35,20 +33,25 @@ public class MidtermApp {
         // generate and place mines on the board
         int numMines = getNumMines(scan);
         placeMines(boardColumns, boardRows, numMines, gameBoard);
-        //method to check for adjacency goes here :)
+        
+        findAdjacency( boardColumns, gameBoard );
+        //sets adjacency values for each element in the arraylist
      
-   //     checkCells(row, column, boardColumns, gameBoard);
-    //    System.out.println("There are " + checkCells(row, column, boardColumns, gameBoard) + "mines next to the cell you picked.");
+        //checkCells(userRow, userColumn, boardColumns, gameBoard);  DEBUGGER
+        
+ 
         // get the user's choice of coordinates to reveal a square
-    /*    System.out.println("Please select a row: ");
-        userY = getYCoordinate(scan);
-        userY--;                                        //decrement user choice to align with our gameBoard arraylist
+        System.out.println("Please select a row: ");
+        userRow = getYCoordinate(scan);
+        userRow--;                                        //decrement user choice to align with our gameBoard arraylist
         System.out.println("Please select a column: ");
-        userX = getXCoordinate(scan);
-        userX--;                                        //decrement user choice to align with our gameBoard arraylist
-        */
+        userColumn = getXCoordinate(scan);
+        userColumn--;                                        //decrement user choice to align with our gameBoard arraylist
+        
+        System.out.println("There are " + checkCells(userRow, userColumn, boardColumns, gameBoard) + "mines next to the cell you picked.");
+        
         //reveal the space the user selected and redisplay the board
-   //     revealInput(userX, userY, gameBoard);
+        revealInput(userRow, userColumn, gameBoard);
         displayBoard(boardColumns, boardRows, gameBoard);
 
      
@@ -108,6 +111,7 @@ public class MidtermApp {
             System.out.println();
         } // end outer loop
         System.out.print("1 ");
+        
         for (int i = 0; i < gameBoard.size(); i++) {
             for (int j = 0; j < gameBoard.get(i).size(); j++) {
                 // System.out.println("gameBoard.get(i).size() = " + gameBoard.get(i).size());
@@ -198,6 +202,21 @@ public class MidtermApp {
         }
 
     }
+    
+    private static void findAdjacency(int boardColumns, ArrayList<ArrayList<Minefield>> gameBoard ) {
+
+        for (int i = 0; i < gameBoard.size(); i++) {  							// gameboard.size() = # rows, i = row # being iterated
+        	
+            for (int j = 0; j < gameBoard.get(i).size(); j++) {  				// gameboard.get(i).size() = # columns, j = column # being iterated
+            	
+            	gameBoard.get(i).get(j).setAdjacency( checkCells(i, j, boardColumns, gameBoard) );
+            }
+        }
+        
+    }
+
+            
+            
 
    private static int checkCells(int currentRow, int currentColumn, int boardColumns, ArrayList<ArrayList<Minefield>> gameBoard)
   //  private static int checkCells(int userY, int userX, int boardColumns, int boardRows, ArrayList<ArrayList<Minefield>> gameBoard)
@@ -223,7 +242,7 @@ public class MidtermApp {
         }
         if (bigColumn >= boardColumns-1) 
         {
-            System.out.println("bigColumn = " + bigColumn);
+ //           System.out.println("bigColumn = " + bigColumn);
             bigColumn = currentColumn;
         }
         

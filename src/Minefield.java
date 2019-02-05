@@ -20,12 +20,14 @@ public class Minefield {
     public Minefield() {        //set defaults to hide the tile and to not have a mine
         this.revealed = false;
         this.mine = false;
+        this.adjacency = 0;
     }
     
     public Minefield(boolean revealed, boolean mine) 
     {
         this.revealed = revealed;
         this.mine = mine;
+        this.adjacency = adjacency;
     }
     
     public void setRevealed(boolean reveal) 
@@ -62,7 +64,7 @@ public class Minefield {
     @Override
     public String toString() 
     {
-        return "Revealed: " + revealed + ", Is there a mine: " + mine + "]";
+        return "Revealed: " + revealed + ", Is there a mine: " + mine + ", Adjancent to " + adjacency + " mines.]";
     } //end toString Override
 
     
