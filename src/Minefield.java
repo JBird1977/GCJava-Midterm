@@ -13,7 +13,7 @@
 public class Minefield {
     private boolean revealed;
     private boolean mine;
-    private int adjacency = 0;
+    private int adjacency;
     
     
 

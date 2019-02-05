@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class MidtermApp {
 
@@ -11,43 +12,52 @@ public class MidtermApp {
     // coordinates (boardRows,boardColumns) for the locations of mines
     // use an if-then to check for duplicate locations -- when found, i-- will force
     // an extra iteration
+	
+		
+	// TO-DO LIST (Priority 1 = most important):
+	// 1. Re-loop to reveal non-mine cells adjacent to userCell...reloop, reloop... 
+	// 1. Add field to minefield class: flagged (as mine)
+	// 3. Try-catch or if: numMines <= numSquares (boardRows * boardColumns)
+
     
     private static ArrayList<ArrayList<Minefield>> gameBoard = new ArrayList<ArrayList<Minefield>>();
     static int boardColumns = 0;
     static int boardRows = 0;
+	private static Stack<StoredCoordinates> coordinatesToCheck = new Stack<StoredCoordinates>();
+
 
     public static void main(String[] args) {
 
         Scanner scan = new Scanner(System.in);
-        
-         // columns
-         // rows
+
         int userRow = 0;
         int userColumn = 0;
         boolean gameCheck = false; // checks for game over status
 
-        // creates the board
-        printTitle(); // prints title
+        printTitle(); // prints Welcome
+        
         System.out.println("Please enter how many rows you want to generate: ");
         do {
             boardRows = getYCoordinate(scan);
         } while ((boardRows == -1));
+        
         System.out.println("Please enter how many columns you want to generate: ");
         do {
             boardColumns = getXCoordinate(scan);
         } while ((boardColumns == -1));
-        createBoard();
+        
+        createBoard();  //creates and populates game board; all cells set to mines and reveal = false; also prints entire board first time only
 
-        // generate/place mines on the board then populate board with numbers
+        
         int numMines = getNumMines(scan);
-        placeMines(numMines);
+        placeMines(numMines);  // randomly places user's # mines on the board
+        
         findAdjacency();
-        // sets adjacency values for each element in the arraylist
+        // sets adjacency values for each element in the gameboard arraylist
 
-        // checkCells(userRow, userColumn, boardColumns, gameBoard); DEBUGGER
+        // checkCells(userRow, userColumn, boardColumns, gameBoard);  DEBUGGER
 
         do {
-
             // get the user's choice of coordinates to reveal a square
             System.out.println("Please select a row: ");
             userRow = getYCoordinate(scan);
@@ -61,8 +71,13 @@ public class MidtermApp {
 
             // reveal the space the user selected and redisplay the board
             revealInput(userRow, userColumn);
+           
             displayBoard();
+            
             gameCheck = gameOverCheck(userRow, userColumn);
+            
+        //    checkAdjacentCells();
+            
         } while (gameCheck == false);
 
         // System.out.println("There are: " + checkCells(userY, userX, boardRows,
@@ -98,33 +113,37 @@ public class MidtermApp {
 
     private static void revealInput(int userX, int userY) {
 
+    	
+    	
+    	
         gameBoard.get(userX).get(userY).setRevealed(true);
     }
 
     private static void createBoard() {
-
         
-        for (int i = 0; i < boardRows; i++) // create the game board
-        {
+        // print column header for game board
+        	for (int k = 0; k < boardColumns; k++) {
+                if (k == 0) {
+                    System.out.printf("   %-1d", (k + 1));
+                } else {
+                    System.out.printf("  %-1d", (k + 1));
+                }
+            }
+        
+
+        for (int Row = 0; Row < boardRows; Row++) {   // populate the game board -- set all cells to mine=false (default)
             gameBoard.add(new ArrayList<Minefield>());
-            for (int j = 0; j < boardColumns; j++) {
-                gameBoard.get(i).add(new Minefield(false, false));
+            
+            for (int Column = 0; Column < boardColumns; Column++) {
+                gameBoard.get(Row).add(new Minefield(false, false));
             }
-
-            System.out.println();
         } // end outer loop
-        for (int k = 0; k < boardColumns; k++) {
-            if (k == 0) {
-                System.out.printf("   %-1d", (k + 1));
-            } else {
-                System.out.printf("  %-1d", (k + 1));
-            }
-
-        }
+        
         System.out.println();
         System.out.print("1 ");
-
-        for (int i = 0; i < gameBoard.size(); i++) {
+        
+// print the entire board
+        for (int i = 0; i < gameBoard.size(); i++) {  
             for (int j = 0; j < gameBoard.get(i).size(); j++) {
                 // System.out.println("gameBoard.get(i).size() = " + gameBoard.get(i).size());
                 if (!gameBoard.get(i).get(j).getRevealed()) {
@@ -134,7 +153,8 @@ public class MidtermApp {
                 }
 
             } // end inner loop
-            System.out.println(); // after printing a row of the board go down to next line
+            
+            System.out.println(); // after printing a row of the board print the row header for next row
             if (i < gameBoard.size() - 1) {
                 System.out.print((i + 2) + " ");
             }
@@ -144,7 +164,7 @@ public class MidtermApp {
     }
 
     private static void displayBoard() {
-        for (int k = 0; k < boardColumns; k++) // display number identifying each column
+        for (int k = 0; k < boardColumns; k++) //  print column header for game board
         {
             if (k == 0) {
                 if (boardRows > 9) {
@@ -268,14 +288,63 @@ public class MidtermApp {
         for (int Row = smallRow; Row <= bigRow; Row++) {
 
             for (int Column = smallColumn; Column <= bigColumn; Column++) {
-                if (gameBoard.get(Row).get(Column).getMine()) {
-                    mineCounter++;
+            	if (gameBoard.get(Row).get(Column).getMine()) {
+            		mineCounter++;
+            	}
+ 
+                if (( gameBoard.get(Row).get(Column).getAdjacency() == 0) ) {
+                  // If this cell is NOT adjacent to a mine, add it to the list of cells to re-check.
+                	coordinatesToCheck.push( new StoredCoordinates(Row,Column) );
+                	gameBoard.get(Row).get(Column).setRevealed(true);
                 }
-
             }
 
         }
         return mineCounter;
     }
 
+
+//    private static void checkAdjacentCells() {   
+//        
+//    	  int mineCounter = 0;
+//          int smallRow = currentRow - 1;
+//          int bigRow = currentRow + 1;
+//          int smallColumn = currentColumn - 1;
+//          int bigColumn = currentColumn + 1;
+//
+//          if (smallRow < 0) {
+//              smallRow = currentRow;
+//          }
+//          if (bigRow >= gameBoard.size()) {
+//              bigRow = currentRow;
+//          }
+//          if (smallColumn < 0) {
+//              smallColumn = currentColumn;
+//          }
+//          if (bigColumn >= boardColumns - 1) {
+//              // System.out.println("bigColumn = " + bigColumn);
+//              bigColumn = currentColumn;
+//          }
+//
+//          for (int Row = smallRow; Row <= bigRow; Row++) {
+//
+//              for (int Column = smallColumn; Column <= bigColumn; Column++) {
+//              	if (gameBoard.get(Row).get(Column).getMine()) {
+//              		mineCounter++;
+//              	}
+//   
+//                  if (( gameBoard.get(Row).get(Column).getAdjacency() == 0) ) {
+//                    // If this cell is NOT adjacent to a mine, add it to the list of cells to re-check.
+//                  	coordinatesToCheck.push( new StoredCoordinates(Row,Column) );
+//                  	gameBoard.get(Row).get(Column).setRevealed(true);
+//                  }
+//              }
+
+
+   
+   
+    	
+  //  }
+    	
+    	
 }
