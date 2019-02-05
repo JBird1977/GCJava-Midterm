@@ -48,7 +48,7 @@ public class MidtermApp {
         userColumn = getXCoordinate(scan);
         userColumn--;                                        //decrement user choice to align with our gameBoard arraylist
         
-        System.out.println("There are " + checkCells(userRow, userColumn, boardColumns, gameBoard) + "mines next to the cell you picked.");
+        //System.out.println("There are " + checkCells(userRow, userColumn, boardColumns, gameBoard) + "mines next to the cell you picked.");
         
         //reveal the space the user selected and redisplay the board
         revealInput(userRow, userColumn, gameBoard);
@@ -105,7 +105,7 @@ public class MidtermApp {
         {
             gameBoard.add(new ArrayList<Minefield>());
             for (int j = 0; j < boardColumns; j++) {
-                gameBoard.get(i).add(new Minefield(true, false));
+                gameBoard.get(i).add(new Minefield(false, false));
             }
 
             System.out.println();
@@ -149,15 +149,14 @@ public class MidtermApp {
                 if (!gameBoard.get(i).get(j).getRevealed()) // if the space hasn't been revealed....
                 {
                     System.out.print("[ ]");
-                } else if (gameBoard.get(i).get(j).getRevealed() && gameBoard.get(i).get(j).getMine()) // if the space
-                                                                                                       // has been
-                                                                                                       // revealed AND a
-                                                                                                       // mine is in
-                                                                                                       // that space...
+                } else if (gameBoard.get(i).get(j).getRevealed() && gameBoard.get(i).get(j).getMine()) 
+                {                                                                                     
+                                                                                                                          // mine is in
+                    System.out.print("[*]");   
+                    
+                } else if (gameBoard.get(i).get(j).getRevealed() && !gameBoard.get(i).get(j).getMine()) 
                 {
-                    System.out.print("[*]");
-                } else if (gameBoard.get(i).get(j).getRevealed() && !gameBoard.get(i).get(j).getMine()) {
-                    System.out.print("[0]");
+                    System.out.print("[" + gameBoard.get(i).get(j).getAdjacency() + "]");
                 }
 
             }
