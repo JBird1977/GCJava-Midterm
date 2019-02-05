@@ -13,10 +13,10 @@
 public class Minefield {
     private boolean revealed;
     private boolean mine;
-    private int adjacency;
-    
-    
+    private int adjacency = 0;
+    private boolean flagged = false;
 
+    
     public Minefield() {        //set defaults to hide the tile and to not have a mine
         this.revealed = false;
         this.mine = false;
@@ -30,6 +30,16 @@ public class Minefield {
         this.adjacency = adjacency;
     }
     
+    public void setFlagged(boolean flagged)
+    {
+        this.flagged = flagged;
+    }
+    
+    public boolean getFlagged()
+    {
+        return flagged;
+    
+    }
     public void setRevealed(boolean reveal) 
     {
         this.revealed =  reveal; //sets whether tile is revealed or not      
