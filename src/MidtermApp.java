@@ -15,6 +15,7 @@ public class MidtermApp {
     private static ArrayList<ArrayList<Minefield>> gameBoard = new ArrayList<ArrayList<Minefield>>();
     static int boardColumns = 0;
     static int boardRows = 0;
+    
 
     public static void main(String[] args) {
 
@@ -22,24 +23,41 @@ public class MidtermApp {
         
          // columns
          // rows
+        int numMines = -1;
         int userRow = 0;
         int userColumn = 0;
+        int mineCount = -1;         //keeps track of number of mines left on the board
         boolean gameCheck = false; // checks for game over status
 
         // creates the board
         printTitle(); // prints title
-        System.out.println("Please enter how many rows you want to generate: ");
+        System.out.println("Please enter how many rows you want to generate. ");
+        System.out.println("You may only enter a number between 1 and 9:");
         do {
             boardRows = getYCoordinate(scan);
+            if (boardRows == 0) 
+            {
+                System.out.println("Please enter a number between 1 and 9");
+                boardRows = -1;
+            }
         } while ((boardRows == -1));
-        System.out.println("Please enter how many columns you want to generate: ");
+        System.out.println("Please enter how many columns you want to generate. ");
+        System.out.println("You may only enter a number between 1 and 9: ");
         do {
             boardColumns = getXCoordinate(scan);
+            if (boardColumns == 0)
+            {
+                System.out.println("Please enter a number between 1 and 9");
+                boardColumns = -1;
+            }
         } while ((boardColumns == -1));
         createBoard();
 
         // generate/place mines on the board then populate board with numbers
-        int numMines = getNumMines(scan);
+        do {
+            numMines = getNumMines(scan);
+        } while (numMines == -1);
+        mineCount = numMines;
         placeMines(numMines);
         findAdjacency();
         // sets adjacency values for each element in the arraylist
@@ -49,7 +67,7 @@ public class MidtermApp {
         do {
 
             // get the user's choice of coordinates to reveal a square
-            System.out.println("Please select a row: ");
+            System.out.println("Please select a row (or 0 on row/column to (un)flag a cell): ");
             userRow = getYCoordinate(scan);
             userRow--; // decrement user choice to align with our gameBoard arraylist
             System.out.println("Please select a column: ");
@@ -60,9 +78,17 @@ public class MidtermApp {
             // boardColumns, gameBoard) + "mines next to the cell you picked.");
 
             // reveal the space the user selected and redisplay the board
-            revealInput(userRow, userColumn);
-            displayBoard();
+            if (userRow == -1 && userColumn == -1)
+            {
+                mineCount = flagCell(scan, mineCount);
+            } else 
+            {
+            revealInput(userRow, userColumn);  
             gameCheck = gameOverCheck(userRow, userColumn);
+            }
+            displayBoard();
+            System.out.println("There are: " + mineCount + " mines left.");
+            
         } while (gameCheck == false);
 
         // System.out.println("There are: " + checkCells(userY, userX, boardRows,
@@ -82,6 +108,12 @@ public class MidtermApp {
             System.out.println("Please enter a number.");
             return -1;
         }
+        
+        if (in < 0 || in > 9)
+        {
+            System.out.println("Please enter a number between 0 and 9.");
+            return -1;
+        }
         return in;
     } // end getYCoordinate
 
@@ -93,12 +125,21 @@ public class MidtermApp {
             System.out.println("Please enter a number.");
             return -1;
         }
+        
+        if (in < 0 || in > 9)
+        {
+            System.out.println("Please enter a number between 1 and 9.");
+            return -1;
+        }
         return in;
     } // end getYCoordinate
 
     private static void revealInput(int userX, int userY) {
 
-        gameBoard.get(userX).get(userY).setRevealed(true);
+        if (gameBoard.get(userX).get(userY).getFlagged())
+        {
+            System.out.println("This cell is flagged. Please select another cell or unflag it to reveal the cell.");
+        } else gameBoard.get(userX).get(userY).setRevealed(true);
     }
 
     private static void createBoard() {
@@ -162,16 +203,22 @@ public class MidtermApp {
         for (int i = 0; i < gameBoard.size(); i++) {
             for (int j = 0; j < gameBoard.get(i).size(); j++) {
 
-                if (!gameBoard.get(i).get(j).getRevealed()) // if the space hasn't been revealed....
+                if (!gameBoard.get(i).get(j).getRevealed() && !gameBoard.get(i).get(j).getFlagged()) // if the space hasn't been revealed....
                 {
                     System.out.print("[ ]");
+                } else if (!gameBoard.get(i).get(j).getRevealed() && gameBoard.get(i).get(j).getFlagged()) 
+                {
+                    System.out.print("[F]");
                 } else if (gameBoard.get(i).get(j).getRevealed() && gameBoard.get(i).get(j).getMine()) {
                     // mine is in
                     System.out.print("[*]");
 
                 } else if (gameBoard.get(i).get(j).getRevealed() && !gameBoard.get(i).get(j).getMine()) {
                     System.out.print("[" + gameBoard.get(i).get(j).getAdjacency() + "]");
-                }
+                
+                }     
+                
+                
 
             }
             System.out.println(); // after printing a row of the board go down to next line
@@ -194,6 +241,11 @@ public class MidtermApp {
             in = scan.nextInt();
         } catch (InputMismatchException e) {
             System.out.println("Please enter a number.");
+            return -1;
+        }
+        if (in >= (boardRows * boardColumns))
+        {
+            System.out.println("That's too many mines! Pick a smaller number!");
             return -1;
         }
         return in;
@@ -278,4 +330,43 @@ public class MidtermApp {
         return mineCounter;
     }
 
+    private static int flagCell(Scanner scan, int mineCount)
+    {
+        int userRow = 0;
+        int userColumn = 0;
+        
+        System.out.println("Please enter the row of the cell to (un)flagged: ");
+        try 
+        {
+        userRow = scan.nextInt();
+        } catch( InputMismatchException e)
+        {
+            System.out.println("Please enter a number.");
+            return -1;
+        }
+        
+        userRow--;
+        System.out.println("Please enter the column of the cell to be (un)flagged: ");
+        try {
+        userColumn = scan.nextInt();
+        } catch( InputMismatchException e)
+        {
+            System.out.println("Please enter a number.");
+            return -1;
+        }
+        
+        userColumn--;
+        if (!gameBoard.get(userRow).get(userColumn).getFlagged())
+        {
+        gameBoard.get(userRow).get(userColumn).setFlagged(true);
+        mineCount = mineCount-1;
+        return mineCount;
+        } else 
+        {
+            gameBoard.get(userRow).get(userColumn).setFlagged(false);
+            mineCount = mineCount + 1;
+            return mineCount;
+        }
+        
+    }
 }
