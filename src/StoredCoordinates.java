@@ -1,4 +1,3 @@
-
 public class StoredCoordinates {
 
     private int row = 0;

@@ -35,7 +35,13 @@ public class MidtermApp {
         int userRow = 0;
         int userColumn = 0;
         int mineCount = -1;         //keeps track of number of mines left on the board
+        int winCount = 0;           //increments if user flagged a cell that has a mine in it. Used for determining win condition
+        int flagRow = 0;
+        int flagColumn = 0;
+        int flagUserRow = -1;
+        int flagUserColumn = -1;
         boolean gameCheck = false; // checks for game over status
+        
 
         printTitle(); // prints Welcome    
         System.out.println("Please enter how many rows you want to generate. ");
@@ -94,25 +100,80 @@ public class MidtermApp {
 
             if (userRow == -1 && userColumn == -1)  // Validation check that the user does NOT want to flag a cell for mine
             {
-                mineCount = flagCell(scan, mineCount);
-            } else 
+              do //validate input for flagged row input 
+              {  
+                System.out.println("Please enter the row of the cell to (un)flagged: ");
+                try 
+                {
+                flagUserRow = scan.nextInt();
+                flagUserRow--;
+                } catch( InputMismatchException e)
+                {
+                    System.out.println("Please enter a number.");
+                    continue;
+                }            
+              } while (flagUserRow == -1);
+             
+              do //validate input for flagged column input 
+              {
+                System.out.println("Please enter the column of the cell to be (un)flagged: ");
+                try 
+                {
+                flagUserColumn = scan.nextInt();
+                flagUserColumn--;
+                } catch( InputMismatchException e)
+                {
+                    System.out.println("Please enter a number.");
+                    continue;
+                }
+                
+              } while (flagUserColumn == -1);
+              
+              if (!gameBoard.get(flagUserRow).get(flagUserColumn).getFlagged()) 
+              {
+                  winCount = flagCell(flagUserRow,  flagUserColumn, winCount);
+                  mineCount--;
+                 
+              } else if (gameBoard.get(userRow).get(userColumn).getFlagged())
+              {
+                  unFlagCell(flagUserRow,  flagUserColumn, winCount);
+                  mineCount++;
+                  winCount = winCountCheck(userRow, userColumn, winCount);
+              }
+              displayBoard();  // displays the entire board in its current state (including user's chosen cell to check or flagged cell)
+              System.out.println("There are: " + mineCount + " mines left.");
+              
+              if (mineCount == 0)
+              {
+                  userRow = 0;      //setting these to 0 to prevent ArrayOutofBoundsException
+                  userColumn = 0;   //user can't blow up a mine when flagging cells so this is fine
+                  gameCheck = gameOverCheck(scan, userRow, userColumn, mineCount, winCount, numMines);
+              }
+             
+            }
+            
+            if (!(userRow == -1) && !(userColumn == -1)) //condition occurs if user did not choose to flag a cell
             {
-            	
             revealInput(userRow, userColumn);  // sets the user's selected cell to reveal = true
-            gameCheck = gameOverCheck(userRow, userColumn);
+            displayBoard();  // displays the entire board in its current state (including user's chosen cell to check or flagged cell)
+            gameCheck = gameOverCheck(scan, userRow, userColumn, mineCount, winCount, numMines);
+            //only print the amount of mines left if the game continues
+                if (gameCheck == false) 
+                {
+                System.out.println("There are: " + mineCount + " mines left.");
+                }
             }
             
             // PUT STACK LOOP FOR EXPLODING ALL 0-ADJACENCY CELLS HERE
             
-            displayBoard();  // displays the entire board in its current state (including user's chosen cell to check or flagged cell)
-            System.out.println("There are: " + mineCount + " mines left.");
+            
 
             
         } while (gameCheck == false);
 
         // System.out.println("There are: " + checkCells(userY, userX, boardRows,
         // boardColumns, gameBoard) + " mines around you."); ;
-
+        scan.close();
     } // end Main
 
     private static void printTitle() {
@@ -253,8 +314,7 @@ public class MidtermApp {
         
         System.out.println(); // insert a blank line for cleaner appearance
     }
-
-    
+  
     private static int getNumMines(Scanner scan) {
         int in = -1;
         System.out.println("Please enter how many mines you would like in your minefield: ");
@@ -306,12 +366,42 @@ public class MidtermApp {
 
     }
 
-    private static boolean gameOverCheck(int userRow, int userColumn) {
-        if (gameBoard.get(userRow).get(userColumn).getRevealed() && gameBoard.get(userRow).get(userColumn).getMine()) {
-            System.out.println("Game over!!!");
+    private static boolean gameOverCheck(Scanner scan, int userRow, int userColumn, int mineCount, int winCount, int numMines) 
+    {
+        scan.nextLine();
+        String in = "";
+        //check to see if player revealed a mine - if they did, it's game over
+        if (gameBoard.get(userRow).get(userColumn).getRevealed() && gameBoard.get(userRow).get(userColumn).getMine()) 
+        {
+            System.out.println("BOOM!!! Game over!");
             return true;
+        } 
+        //if there are no more mines left to find on the board, ask if the user is ready to check and see if they won
+        if (mineCount == 0)
+        {
+            do {  
+                System.out.println("All mines are accounted for! Would you like to check and see if you won? (y/n) ");
+                in = scan.nextLine();
+                if (in.equalsIgnoreCase("y") && in.equalsIgnoreCase("n"))
+                {
+                    System.out.println("Invalid input. Please enter y or n");
+                }
+            } while (in.equalsIgnoreCase("y") && in.equalsIgnoreCase("n"));
+      
+            if (in.equalsIgnoreCase("y"))
+            {
+  
+                if (mineCount == 0  && winCount == numMines) 
+                {
+                    System.out.println("You won!!!");
+                    return true;
+                } else if (mineCount == 0 && winCount != numMines) {
+                              System.out.println("One or more cells were incorrectly flagged :(. You go boom.");
+                              return true;
+                }
+            }
         }
-        return false;
+    return false;
     }
 
     private static int checkCells(int currentRow, int currentColumn)
@@ -393,45 +483,41 @@ public class MidtermApp {
 //              } 	
   //  }
     	
-    	
-    private static int flagCell(Scanner scan, int mineCount)
-    {
-        int userRow = 0;
-        int userColumn = 0;
-        
-        System.out.println("Please enter the row of the cell to (un)flagged: ");
-        try 
+    //this method is called ONLY when the user successfully flags or unflags a space
+    private static int winCountCheck(int userRow, int userColumn, int winCount) {
+            //if the user flagged a space that DOES contain a mine, increment winCount and return
+        if (gameBoard.get(userRow).get(userColumn).getFlagged() && gameBoard.get(userRow).get(userColumn).getMine())
         {
-        userRow = scan.nextInt();
-        } catch( InputMismatchException e)
+            winCount++;
+            return winCount;
+                //if the user flags a space that ISN'T a mine, return winCount
+        } else if (gameBoard.get(userRow).get(userColumn).getFlagged() && !gameBoard.get(userRow).get(userColumn).getMine())
+        { 
+            return winCount;
+            //if the user unflags a space that contained a mine, decrement the winCount and return 
+        } else if (!gameBoard.get(userRow).get(userColumn).getFlagged() && gameBoard.get(userRow).get(userColumn).getMine())
         {
-            System.out.println("Please enter a number.");
-            return -1;
+            winCount--;
+            return winCount;
         }
         
-        userRow--;
-        System.out.println("Please enter the column of the cell to be (un)flagged: ");
-        try {
-        userColumn = scan.nextInt();
-        } catch( InputMismatchException e)
-        {
-            System.out.println("Please enter a number.");
-            return -1;
-        }
-        
-        userColumn--;
-        if (!gameBoard.get(userRow).get(userColumn).getFlagged())
-        {
-        gameBoard.get(userRow).get(userColumn).setFlagged(true);
-        mineCount = mineCount-1;
-        return mineCount;
-        } else 
-        {
-            gameBoard.get(userRow).get(userColumn).setFlagged(false);
-            mineCount = mineCount + 1;
-            return mineCount;
-        }
+        return winCount;
         
     }
+    
+    //called when the user flags or unflags a space
+    private static int flagCell(int flagUserRow, int flagUserColumn, int winCount)
+    {
+        gameBoard.get(flagUserRow).get(flagUserColumn).setFlagged(true);
+        return winCount = winCountCheck(flagUserRow, flagUserColumn, winCount);
+
+    }
+    
+    private static int unFlagCell(int flagUserRow, int flagUserColumn, int winCount)
+    {
+        gameBoard.get(flagUserRow).get(flagUserColumn).setFlagged(false);
+        return winCount = winCountCheck(flagUserRow, flagUserColumn, winCount);
+    }
+    
 
 }
