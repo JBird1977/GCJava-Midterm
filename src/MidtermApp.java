@@ -44,9 +44,10 @@ public class MidtermApp {
         
 
         printTitle(); // prints Welcome    
+        do {
         System.out.println("Please enter how many rows you want to generate. ");
         System.out.println("You may only enter a number between 1 and 9:");
-        do {
+        
             boardRows = getYCoordinate(scan);
             if (boardRows == 0) 
             {
@@ -55,9 +56,10 @@ public class MidtermApp {
             }
         } while ((boardRows == -1));
 
+        do {
         System.out.println("Please enter how many columns you want to generate. ");
         System.out.println("You may only enter a number between 1 and 9: ");
-        do {
+        
             boardColumns = getXCoordinate(scan);
             if (boardColumns == 0)
             {
@@ -181,18 +183,22 @@ public class MidtermApp {
     } // end printTitle
 
     private static int getYCoordinate(Scanner scan) {
+        
         int in = -1;
         try {
             in = scan.nextInt();
         } catch (InputMismatchException e) {
             System.out.println("Please enter a number.");
+            scan.nextLine();
             return -1;
         }
         
         if (in < 0 || in > 9)
         {
-            System.out.println("Please enter a number between 0 and 9.");
+            System.out.println("Please enter a number between 1 and 9.");
+            scan.nextLine();
             return -1;
+            
         }
         return in;
     } // end getYCoordinate
@@ -203,12 +209,14 @@ public class MidtermApp {
             in = scan.nextInt();
         } catch (InputMismatchException e) {
             System.out.println("Please enter a number.");
+            scan.nextLine();
             return -1;
         }
         
         if (in < 0 || in > 9)
         {
             System.out.println("Please enter a number between 1 and 9.");
+            scan.nextLine();
             return -1;
         }
         return in;
@@ -322,11 +330,13 @@ public class MidtermApp {
             in = scan.nextInt();
         } catch (InputMismatchException e) {
             System.out.println("Please enter a number.");
+            scan.nextLine();
             return -1;
         }
         if (in >= (boardRows * boardColumns))
         {
             System.out.println("That's too many mines! Pick a smaller number!");
+            scan.nextLine();
             return -1;
         }
         return in;
