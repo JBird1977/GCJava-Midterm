@@ -36,8 +36,6 @@ public class MidtermApp {
         int userColumn = 0;
         int mineCount = -1;         //keeps track of number of mines left on the board
         int winCount = 0;           //increments if user flagged a cell that has a mine in it. Used for determining win condition
-        int flagRow = 0;
-        int flagColumn = 0;
         int flagUserRow = -1;
         int flagUserColumn = -1;
         boolean gameCheck = false; // checks for game over status
@@ -456,43 +454,7 @@ public class MidtermApp {
     }
 
 
-//    private static void checkAdjacentCells() {   
-//        
-//    	  int mineCounter = 0;
-//          int smallRow = currentRow - 1;
-//          int bigRow = currentRow + 1;
-//          int smallColumn = currentColumn - 1;
-//          int bigColumn = currentColumn + 1;
-//
-//          if (smallRow < 0) {
-//              smallRow = currentRow;
-//          }
-//          if (bigRow >= gameBoard.size()) {
-//              bigRow = currentRow;
-//          }
-//          if (smallColumn < 0) {
-//              smallColumn = currentColumn;
-//          }
-//          if (bigColumn >= boardColumns - 1) {
-//              // System.out.println("bigColumn = " + bigColumn);
-//              bigColumn = currentColumn;
-//          }
-//
-//          for (int Row = smallRow; Row <= bigRow; Row++) {
-//
-//              for (int Column = smallColumn; Column <= bigColumn; Column++) {
-//              	if (gameBoard.get(Row).get(Column).getMine()) {
-//              		mineCounter++;
-//              	}
-//   
-//                  if (( gameBoard.get(Row).get(Column).getAdjacency() == 0) ) {
-//                    // If this cell is NOT adjacent to a mine, add it to the list of cells to re-check.
-//                  	coordinatesToCheck.push( new StoredCoordinates(Row,Column) );
-//                  	gameBoard.get(Row).get(Column).setRevealed(true);
-//                  }
-//              } 	
-  //  }
-    	
+
     //this method is called ONLY when the user successfully flags or unflags a space
     private static int winCountCheck(int userRow, int userColumn, int winCount) {
             //if the user flagged a space that DOES contain a mine, increment winCount and return
