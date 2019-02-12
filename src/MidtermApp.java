@@ -7,9 +7,10 @@ import java.util.Stack;
 public class MidtermApp {
 
     // CREATE 2D ARRAY FOR MINEFIELD
-    // user enters 2 integers -- i for the # of columns, n for the # of mines
-    // iterate n times through a for loop using random.int to generate both
-    // coordinates (boardRows,boardColumns) for the locations of mines
+    // user enters 2 integers -- for the # of rows and the # of columns
+	// user enters integer  for the # of mines
+    // iterate n times through a for loop using random.int to generate 
+    // both coordinates (boardRow,boardColumn) for the locations of mines
     // use an if-then to check for duplicate locations -- when found, i-- will force
     // an extra iteration
 	
@@ -95,8 +96,7 @@ public class MidtermApp {
         //    displayBoard();
             
         //    gameCheck = gameOverCheck(userRow, userColumn);
-            
-        //    checkAdjacentCells();
+              
 
             if (userRow == -1 && userColumn == -1)  // Validation check that the user does NOT want to flag a cell for mine
             {
@@ -164,7 +164,23 @@ public class MidtermApp {
                 }
             }
             
-            // PUT STACK LOOP FOR EXPLODING ALL 0-ADJACENCY CELLS HERE
+            checkAdjacentCells(userRow, userColumn);  // LOOP FOR REVEALING ALL 0-ADJACENCY CELLS 
+            
+            
+            while (! coordinatesToCheck.isEmpty() )
+            { System.out.println(coordinatesToCheck.isEmpty());  //DEBUGGER
+           
+            	StoredCoordinates nextCheck = new StoredCoordinates();
+            	nextCheck = coordinatesToCheck.pop();
+            	
+            	int row = nextCheck.getRow();
+            	int column = nextCheck.getColumn();
+            	
+            	System.out.println("row = " + row);							//DEBUGGER
+            	System.out.println("column = " + column);					//DEBUGGER
+            	
+            	checkAdjacentCells(row, column);
+            }
             
             
 
@@ -358,20 +374,17 @@ public class MidtermApp {
                 numMinesSet++;
             }
         }
-
     }
 
     private static void findAdjacency() {
 
         for (int row = 0; row < gameBoard.size(); row++) { // gameboard.size() = # rows, row = row # being iterated
 
-            for (int column = 0; column < gameBoard.get(row).size(); column++) { // gameboard.get(row).size() = # columns, column = column #
-                                                                // being iterated
-
+            for (int column = 0; column < gameBoard.get(row).size(); column++) { // gameboard.get(row).size() = # columns, column = column # being iterated
+ 
                 gameBoard.get(row).get(column).setAdjacency(checkCells(row, column));
             }
         }
-
     }
 
     private static boolean gameOverCheck(Scanner scan, int userRow, int userColumn, int mineCount, int winCount, int numMines) 
@@ -444,8 +457,6 @@ public class MidtermApp {
             	}
  
                 if (( gameBoard.get(Row).get(Column).getAdjacency() == 0) ) {
-                  // If this cell is NOT adjacent to a mine, add it to the list of cells to re-check.
-                	
                 }
             }
 
@@ -454,6 +465,52 @@ public class MidtermApp {
     }
 
 
+
+    private static void checkAdjacentCells(int currentRow, int currentColumn) {   
+        
+          int smallRow = currentRow - 1;
+          int bigRow = currentRow + 1;
+          int smallColumn = currentColumn - 1;
+          int bigColumn = currentColumn + 1;
+
+          if (smallRow < 0) {
+              smallRow = currentRow;
+          }
+          if (bigRow >= gameBoard.size()) {
+              bigRow = currentRow;
+          }
+          if (smallColumn < 0) {
+              smallColumn = currentColumn;
+          }
+          if (bigColumn >= boardColumns) {											// MOST RECENT CHANGE: boardColumns -1
+              // System.out.println("bigColumn = " + bigColumn);
+              bigColumn = currentColumn;
+          }
+
+          for (int Row = smallRow; Row <= bigRow; Row++) 
+          {
+              for (int Column = smallColumn; Column <= bigColumn; Column++) 
+              {
+            	  if ( gameBoard.get(Row).get(Column).getFlagged() )
+            	  { // If the cell is already flagged, do nothing 
+            	  } 
+            	  
+            	  if ( gameBoard.get(Row).get(Column).getMine() )
+            	  { // If the cell contains a mine, do nothing 
+            	  }	
+            	  	
+            	  else if ( (gameBoard.get(Row).get(Column).getAdjacency() == 0) && !(gameBoard.get(Row).get(Column).getRevealed()) ) 
+    			  {  // If this cell is NOT adjacent to a mine, and NOT yet revealed, 
+						coordinatesToCheck.push( new StoredCoordinates(Row,Column) );  //add this cell to the stack of cells to re-check.
+						gameBoard.get(Row).get(Column).setRevealed(true);			   //reveal this cell 
+    			  }
+				  
+    			  else gameBoard.get(Row).get(Column).setRevealed(true);
+    						
+              }
+          }
+	}
+    	
 
     //this method is called ONLY when the user successfully flags or unflags a space
     private static int winCountCheck(int userRow, int userColumn, int winCount) {
